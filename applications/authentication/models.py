@@ -8,6 +8,7 @@ class User(AbstractUser):
         ADMIN = 'admin'
         FACTORY_MANAGER = 'factory_manager'
         DISTRIBUTOR = 'distributor'
+        DEALERSHIP = 'dealership'
         RETAIL_CHAIN_MANAGER = 'retail chain manager'
         INDIVIDUAL_ENTREPRENEUR = 'individual entrepreneur'
 
