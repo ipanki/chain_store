@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-
+    'applications.authentication.apps.AuthenticationConfig',
 ]
 
 MIDDLEWARE = [
@@ -84,17 +84,6 @@ DATABASES = {
         'ATOMIC_REQUESTS': os.getenv('ATOMIC_REQUESTS'),
     }
 }
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -143,6 +132,7 @@ REST_FRAMEWORK = {
     ),
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'applications.authentication.token_auth.SafeJWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -155,3 +145,5 @@ REST_FRAMEWORK = {
 }
 
 TOKEN_EXPIRATION_DATE = 1
+
+AUTH_USER_MODEL = 'authentication.User'
