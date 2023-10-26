@@ -1,14 +1,34 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from applications.distributor.models import Distributor
 
 
-class MembershipInline(admin.TabularInline):
+@admin.action(description="Cancel debt")
+def cancel_debt(modeladmin, request, queryset):
+    queryset.update(debt=0)
+
+
+class EmployeeInline(admin.TabularInline):
     model = Distributor.employees.through
 
 
 @admin.register(Distributor)
-class FactoryAdmin(admin.ModelAdmin):
-    inlines = (MembershipInline,)
-    list_display = ('name', 'contacts')
+class DistributorAdmin(admin.ModelAdmin):
+    inlines = (EmployeeInline,)
+    list_display = ('name', 'email', 'supplier_name', 'debt', 'created_date')
+    list_filter = ('contacts__location__city',)
+    actions = [cancel_debt]
+
+    def email(self, obj):
+        return obj.contacts.email
+
+    def supplier_name(self, obj):
+        app_label = obj.supplier._meta.app_label
+        model_label = obj.supplier._meta.model_name
+        url = reverse(
+            f'admin:{app_label}_{model_label}_change', args=(obj.supplier.id,)
+        )
+        return mark_safe(f'<a href="{url}">{obj.supplier.name}</a>')
 
