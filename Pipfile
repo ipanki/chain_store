@@ -40,6 +40,7 @@ pylint = "*"
 fixtures = "*"
 drf-yasg = "*"
 django-debug-toolbar = "*"
+drf-writable-nested = "*"
 
 [dev-packages]
 autoflake = "1.4"

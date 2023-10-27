@@ -42,13 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'applications.authentication.apps.AuthenticationConfig',
     'applications.product.apps.ProductConfig',
-    'applications.factory.apps.FactoryConfig',
-    'applications.contacts.apps.ContactsConfig',
-    'applications.distributor.apps.DistributorConfig',
-    'applications.dealership.apps.DealershipConfig',
-    'applications.retail_chain.apps.RetailChainConfig',
-    'applications.individual_entrepreneur.apps.IndividualEntrepreneurConfig',
-
+    'django_filters',
+    'applications.company.apps.CompanyConfig',
 ]
 
 MIDDLEWARE = [

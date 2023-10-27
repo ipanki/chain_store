@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cfa9371ab4a81fc998156965391bc1032ae28443344b4642c354334ee26a0aa2"
+            "sha256": "7ddfab884f73aff30372a31cb720c3f67d40583b08b65825259ee390a473d103"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -265,7 +265,7 @@
                 "sha256:a0713dc7a1de3f06bc0df5a9567ad19ead2d3d5689b434768a6145bff77c0667",
                 "sha256:f184f0d851d96b6d29297354ed981b7dd71df7ff500d82fa6d11f0856bee8035"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.6.2'",
+            "markers": "python_full_version >= '3.6.2' and python_full_version < '4.0.0'",
             "version": "==0.3.0"
         },
         "click-plugins": {
@@ -446,6 +446,13 @@
             ],
             "index": "pypi",
             "version": "==0.93.4"
+        },
+        "drf-writable-nested": {
+            "hashes": [
+                "sha256:154c0381e8a3a477e0fd539d5e1caf8ff4c1097a9c0c0fe741d4858b11b0455b"
+            ],
+            "index": "pypi",
+            "version": "==0.7.0"
         },
         "drf-yasg": {
             "hashes": [
