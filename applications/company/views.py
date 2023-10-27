@@ -6,13 +6,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 from applications.company.serializers import CreateCompanySerializer, GetCompanySerializer, CreateCompanyProductSerializer
 from applications.company.models import Company, CompanyProduct
+from applications.company.permissions import CompanyPermission, CompanyProductPermission
 
 
 class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (CompanyPermission,)
     serializer_class = CreateCompanySerializer
     queryset = Company.objects.all()
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
@@ -37,13 +39,13 @@ class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.Up
     @action(detail=False, methods=['post'], url_path='stats')
     def debt_statistics(self, request):
         avg_debt = Company.objects.aggregate(average_debt=Avg("debt"))
-        stats = Company.objects.filter(debt__gt=avg_debt['average_debt'])
+        stats = Company.objects.filter(Q(debt__gt=avg_debt['average_debt']) & Q(user=request.user))
         serializer = GetCompanySerializer(stats, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class CompanyProductViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (CompanyProductPermission,)
     serializer_class = CreateCompanyProductSerializer
     queryset = CompanyProduct.objects.all()
 
