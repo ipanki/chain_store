@@ -18,7 +18,7 @@ from django.urls import include, path
 
 v1_urls = [
     path('', include('applications.authentication.urls')),
-    path('', include('applications.company.urls')),
+    path('', include('applications.companies.urls')),
 ]
 
 urlpatterns = [

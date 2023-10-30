@@ -1,7 +1,4 @@
 from rest_framework.permissions import BasePermission
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import exceptions
 
 
 class CompanyPermission(BasePermission):
@@ -10,8 +7,8 @@ class CompanyPermission(BasePermission):
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ['create', 'update', 'partial_update', 'retrieve', 'delete']:
-            return obj.user == request.user
+        if view.action in ['create', 'update', 'partial_update', 'retrieve', 'destroy']:
+            return obj.owner == request.user
         return False
 
 
@@ -21,8 +18,6 @@ class CompanyProductPermission(BasePermission):
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ['create', 'update', 'partial_update', 'delete']:
-            return obj.company.user == request.user
-        elif view.action in ['retrieve']:
-            return True
+        if view.action in ['retrieve', 'create', 'update', 'partial_update', 'destroy']:
+            return obj.company.owner == request.user
         return False

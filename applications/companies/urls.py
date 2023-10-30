@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework_nested import routers
 
-from applications.company import views
+from applications.companies import views
 
 router = routers.DefaultRouter()
 router.register('companies', views.CompanyViewSet, 'companies')

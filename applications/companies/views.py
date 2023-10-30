@@ -8,18 +8,21 @@ from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 
-from applications.company.serializers import CreateCompanySerializer, GetCompanySerializer, CreateCompanyProductSerializer
-from applications.company.models import Company, CompanyProduct
-from applications.company.permissions import CompanyPermission, CompanyProductPermission
+from applications.companies.serializers import CreateCompanySerializer, GetCompanySerializer, CreateCompanyProductSerializer
+from applications.companies.models import Company, CompanyProduct
+from applications.companies.permissions import CompanyPermission, CompanyProductPermission
 
 
 class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     permission_classes = (CompanyPermission,)
     serializer_class = CreateCompanySerializer
-    queryset = Company.objects.all()
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ('contacts__location__country',)
     filterset_fields = ('category',)
+
+    def get_queryset(self):
+        queryset = Company.objects.filter(owner=self.request.user)
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -27,19 +30,18 @@ class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.Up
         return super().get_serializer_class()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(owner=self.request.user)
 
     @action(detail=True, methods=['post'], url_path='search')
     def get_company_by_product_id(self, request, pk):
-        product = CompanyProduct.objects.filter(product__id=pk).values_list('company__id', flat=True)
-        company = Company.objects.filter(pk__in=product)
+        company = self.get_queryset().filter(products__product__id=pk)
         serializer = GetCompanySerializer(company, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     @action(detail=False, methods=['post'], url_path='stats')
     def debt_statistics(self, request):
         avg_debt = Company.objects.aggregate(average_debt=Avg("debt"))
-        stats = Company.objects.filter(Q(debt__gt=avg_debt['average_debt']) & Q(user=request.user))
+        stats = self.get_queryset().filter(debt__gt=avg_debt['average_debt'])
         serializer = GetCompanySerializer(stats, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
@@ -47,5 +49,7 @@ class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.Up
 class CompanyProductViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     permission_classes = (CompanyProductPermission,)
     serializer_class = CreateCompanyProductSerializer
-    queryset = CompanyProduct.objects.all()
 
+    def get_queryset(self):
+        queryset = CompanyProduct.objects.filter(company__owner=self.request.user)
+        return queryset
