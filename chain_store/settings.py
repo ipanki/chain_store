@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'applications.products.apps.ProductsConfig',
     'django_filters',
     'applications.companies.apps.CompaniesConfig',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -123,11 +125,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CELERY_TIMEZONE = "Europe/Minsk"
+CELERY_BROKER_URL = "redis://%s:%s" % (os.getenv('REDIS_HOST'),
+                                       os.getenv('REDIS_PORT'))
+CELERY_RESULT_BACKEND = "redis://%s:%s" % (
+    os.getenv('REDIS_HOST'), os.getenv('REDIS_PORT'))
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -150,3 +162,7 @@ REST_FRAMEWORK = {
 TOKEN_EXPIRATION_DATE = 1
 
 AUTH_USER_MODEL = 'authentication.User'
+
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')

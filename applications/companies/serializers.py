@@ -1,7 +1,8 @@
-from rest_framework import serializers
 from drf_writable_nested import WritableNestedModelSerializer
+from rest_framework import serializers
 
-from applications.companies.models import Company, CompanyProduct, Address
+from applications.companies.models import (Address, Company, CompanyProduct,
+                                           Employee)
 from applications.products.serializers import ProductSerializer
 
 
@@ -17,7 +18,7 @@ class CreateCompanySerializer(WritableNestedModelSerializer, serializers.ModelSe
 
     class Meta:
         model = Company
-        fields = ('category', 'name', 'address', 'supplier')
+        fields = ('category', 'name', 'email', 'address', 'supplier')
 
 
 class GetCompanySerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
@@ -25,7 +26,8 @@ class GetCompanySerializer(WritableNestedModelSerializer, serializers.ModelSeria
 
     class Meta:
         model = Company
-        fields = ('id', 'name', 'category', 'address', 'supplier', 'debt')
+        fields = ('id', 'name', 'category', 'email',
+                  'address', 'supplier', 'debt')
 
 
 class CreateCompanyProductSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
@@ -34,3 +36,10 @@ class CreateCompanyProductSerializer(WritableNestedModelSerializer, serializers.
     class Meta:
         model = CompanyProduct
         fields = ('count', 'product', 'company')
+
+
+class CreateEmployeeSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
+
+    class Meta:
+        model = Employee
+        fields = ('first_name', 'last_name', 'email', 'company')

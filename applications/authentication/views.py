@@ -3,8 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from applications.authentication.token_auth import login_user
 from applications.authentication.serializers import UserCreateSerializer
+from applications.authentication.token_auth import login_user
 
 
 class RegistrationViewSet(ViewSet):

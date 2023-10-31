@@ -8,4 +8,3 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('name', 'model', 'launch_date')
-

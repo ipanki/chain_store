@@ -10,4 +10,54 @@ services:
       - ./.var/postgresql:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
+  redis:
+    container_name: chain-store-redis
+    image: redis:6-alpine
+    volumes:
+      - ./.var/redis:/data
+    ports:
+      - "6379:6379"
+  celery:
+    container_name: chain-store-celery
+    build: .
+    command: pipenv run celery -A chain_store worker -l INFO
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+  celery-beat:
+    container_name: chain-store-celery-beat
+    build: .
+    command: pipenv run celery -A chain_store beat -l INFO
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  app:
+    container_name: chain-store-app
+    build: .
+    command: pipenv run python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+      - celery
+      - celery-beat
+      - mailhog

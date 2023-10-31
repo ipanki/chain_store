@@ -17,8 +17,10 @@ class AbstractCompanyInstance(AbstractInstance):
         RETAIL_CHAIN = 'retail chain'
         INDIVIDUAL_ENTREPRENEUR = 'individual entrepreneur'
 
-    category = models.CharField(max_length=30, choices=Categories.choices, null=True)
-    supplier = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
+    category = models.CharField(
+        max_length=30, choices=Categories.choices, null=True)
+    supplier = models.ForeignKey(
+        'self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     debt = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     class Meta:

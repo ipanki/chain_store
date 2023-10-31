@@ -1,13 +1,14 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 from django_countries.fields import CountryField
 
-from applications.extensions.abstract_models import AbstractInstance, AbstractCompanyInstance
+from applications.extensions.abstract_models import (AbstractCompanyInstance,
+                                                     AbstractInstance)
 
 
 class Company(AbstractCompanyInstance):
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="owners")
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="companies")
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
     address = models.ForeignKey(
@@ -33,10 +34,8 @@ class Employee(AbstractInstance):
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
     email = models.EmailField(max_length=254, unique=True)
-    company = models.ForeignKey('companies.Company', on_delete=models.CASCADE, related_name="employees")
+    company = models.ForeignKey(
+        'companies.Company', on_delete=models.CASCADE, related_name="employees")
 
     class Meta:
         unique_together = ('email', 'company',)
-
-
-

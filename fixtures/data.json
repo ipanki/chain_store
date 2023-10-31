@@ -1,0 +1,97 @@
+[
+   {
+    "model": "authentication.user",
+    "pk": 1,
+    "fields": {
+      "username": "razdva",
+      "email": "test@gmail.com",
+      "password": "pythonenjoyer"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "name": "Pants",
+      "model": "M",
+      "launch_date": "2023-03-10"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "name": "Socks",
+      "model": "Burberry",
+      "launch_date": "2023-03-10"
+    }
+  },
+  {
+    "model": "companies.address",
+    "pk": 1,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "country": "BY",
+      "city": "Minsk",
+      "street": "Brestskaya",
+      "house": "15"
+    }
+  },
+  {
+    "model": "companies.company",
+    "pk": 1,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "owner": 1,
+      "category": "factory",
+      "name": "RazDva",
+      "email": "razdva@gmail.com",
+      "address": 1,
+      "supplier": null,
+      "debt": 0
+    }
+  },
+  {
+    "model": "companies.company",
+    "pk": 2,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "owner": 1,
+      "category": "distributor",
+      "name": "DvaRaz",
+      "email": "dvaraz@gmail.com",
+      "address": 1,
+      "supplier": 1,
+      "debt": 120.00
+    }
+  },
+  {
+    "model": "companies.companyproduct",
+    "pk": 1,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "count": 1,
+      "product": 1,
+      "company": 1
+    }
+  },
+  {
+    "model": "companies.companyproduct",
+    "pk": 2,
+    "fields": {
+      "created_date": "2023-03-02T08:14:08.844Z",
+      "updated_date": "2023-03-02T08:14:08.844Z",
+      "count": 2,
+      "product": 2,
+      "company": 2
+    }
+  }
+]

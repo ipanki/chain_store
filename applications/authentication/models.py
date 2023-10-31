@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
@@ -13,7 +13,8 @@ class User(AbstractUser):
         INDIVIDUAL_ENTREPRENEUR = 'individual entrepreneur'
 
     email = models.EmailField(max_length=254, unique=True)
-    role = models.CharField(max_length=30, choices=Roles.choices, default=Roles.USER)
+    role = models.CharField(
+        max_length=30, choices=Roles.choices, default=Roles.USER)
     title = models.CharField(max_length=80, blank=True)
 
     def __str__(self):

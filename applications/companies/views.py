@@ -1,19 +1,23 @@
-from rest_framework import mixins, viewsets
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from applications.companies.serializers import CreateCompanySerializer, GetCompanySerializer, CreateCompanyProductSerializer
-from applications.companies.models import Company, CompanyProduct
-from applications.companies.permissions import CompanyPermission, CompanyProductPermission
+from applications.companies.models import Company, CompanyProduct, Employee
+from applications.companies.permissions import (CompanyPermission,
+                                                CompanyProductPermission)
+from applications.companies.serializers import (CreateCompanyProductSerializer,
+                                                CreateCompanySerializer,
+                                                CreateEmployeeSerializer,
+                                                GetCompanySerializer)
+from applications.companies.services import generate_qrcode
+from applications.companies.tasks import send_by_email
 
 
-class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class CompanyViewSet(viewsets.ModelViewSet):
     permission_classes = (CompanyPermission,)
     serializer_class = CreateCompanySerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
@@ -45,11 +49,36 @@ class CompanyViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.Up
         serializer = GetCompanySerializer(stats, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
+    @action(detail=True, methods=['post'], url_path='qrcode')
+    def get_qrcode(self, request, pk):
+        company = get_object_or_404(Company, pk=pk)
+        qr = generate_qrcode(company.email)
+        send_by_email.delay(request.user.email, qr)
+        return Response(status=status.HTTP_200_OK, data='QRcode has been sent to your email')
 
-class CompanyProductViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+
+class CompanyProductViewSet(viewsets.ModelViewSet):
     permission_classes = (CompanyProductPermission,)
     serializer_class = CreateCompanyProductSerializer
 
     def get_queryset(self):
-        queryset = CompanyProduct.objects.filter(company__owner=self.request.user)
+        queryset = CompanyProduct.objects.filter(
+            company__owner=self.request.user)
         return queryset
+
+
+class EmployeeViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CreateEmployeeSerializer
+
+    def get_queryset(self):
+        queryset = Employee.objects.filter(company__owner=self.request.user)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        company = self.request.user.companies.filter(
+            pk=request.data['company']).first()
+        if company:
+            return super().create(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="You can only add employees to your own companies")

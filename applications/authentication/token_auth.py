@@ -2,9 +2,10 @@ import datetime
 
 import jwt
 from django.conf import settings
-from applications.authentication.models import User
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
+
+from applications.authentication.models import User
 
 
 class SafeJWTAuthentication(BaseAuthentication):

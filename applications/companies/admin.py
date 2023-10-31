@@ -1,23 +1,30 @@
 from django.contrib import admin
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from applications.companies.models import Company, CompanyProduct, Address
+
+from applications.companies.models import (Address, Company, CompanyProduct,
+                                           Employee)
+from applications.companies.tasks import async_cancel_debt
 
 
 @admin.action(description="Cancel debt")
 def cancel_debt(modeladmin, request, queryset):
-    queryset.update(debt=0)
+    if len(queryset) > 20:
+        async_cancel_debt.delay(queryset)
+    else:
+        queryset.update(debt=0)
 
 
 @admin.register(Address)
 class Address(admin.ModelAdmin):
-    model = Address
     list_display = ('country', 'city', 'street', 'house')
 
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'category', 'name', 'supplier_name', 'debt', 'email')
+    list_display = ('id', 'category', 'name', 'supplier_name',
+                    'debt', 'email', 'copy_email')
     list_filter = ('address__city',)
     actions = [cancel_debt]
 
@@ -31,7 +38,21 @@ class CompanyAdmin(admin.ModelAdmin):
         )
         return mark_safe(f'<a href="{url}">{obj.supplier.name}</a>')
 
+    def copy_email(self, obj):
+        return format_html(
+            '<button onclick="copyToClipBoard(\'{}\')">Copy email</button>', obj.email)
+
+    class Media:
+        js = [
+            'clipboard.js'
+        ]
+
 
 @admin.register(CompanyProduct)
 class DealershipAdmin(admin.ModelAdmin):
     list_display = ('id', 'count', 'product', 'company')
+
+
+@admin.register(Employee)
+class Address(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'email', 'company')
