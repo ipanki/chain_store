@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from applications.companies import tasks
 from applications.companies.models import Company, CompanyProduct, Employee
 from applications.companies.permissions import (CompanyPermission,
                                                 CompanyProductPermission)
@@ -13,8 +14,6 @@ from applications.companies.serializers import (CreateCompanyProductSerializer,
                                                 CreateCompanySerializer,
                                                 CreateEmployeeSerializer,
                                                 GetCompanySerializer)
-from applications.companies.services import generate_qrcode
-from applications.companies.tasks import send_by_email
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -52,8 +51,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='qrcode')
     def get_qrcode(self, request, pk):
         company = get_object_or_404(Company, pk=pk)
-        qr = generate_qrcode(company.email)
-        send_by_email.delay(request.user.email, qr)
+        tasks.send_qrcode_email.delay(request.user.email, company.email)
         return Response(status=status.HTTP_200_OK, data='QRcode has been sent to your email')
 
 

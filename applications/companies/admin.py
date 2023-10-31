@@ -3,16 +3,16 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from applications.companies import tasks
 from applications.companies.models import (Address, Company, CompanyProduct,
                                            Employee)
-from applications.companies.tasks import async_cancel_debt
 
 
 @admin.action(description="Cancel debt")
 def cancel_debt(modeladmin, request, queryset):
     if len(queryset) > 20:
-        companies_id = queryset.values_list("pk", flat=True)
-        async_cancel_debt.delay(list(companies_id))
+        ids = queryset.values_list("pk", flat=True)
+        tasks.cancel_companies_debt.delay(list(ids))
     else:
         queryset.update(debt=0)
 

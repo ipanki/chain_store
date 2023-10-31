@@ -1,32 +1,41 @@
+import tempfile
+
+import qrcode
 from django.core.mail import EmailMultiAlternatives
 
+from applications.companies import services
 from applications.companies.models import Company
-from applications.companies.services import increase_debt, reduce_debt
 from chain_store.celery import app
 
 
 @app.task
-def async_cancel_debt(companies_id):
-    Company.objects.filter(pk__in=companies_id).update(debt=0)
+def cancel_companies_debt(ids):
+    Company.objects.filter(pk__in=ids).update(debt=0)
 
 
 @app.task
-def increase_company_debt():
-    increase_debt.delay()
+def increase_companies_debt():
+    return services.increase_debt()
 
 
 @app.task
-def reduce_company_debt():
-    reduce_debt.delay()
+def reduce_companies_debt():
+    return services.reduce_debt()
 
 
 @app.task
-def send_by_email(user_email, image_path):
+def send_qrcode_email(company_email, user_email):
     msg = EmailMultiAlternatives(
         subject='QRcode with company email',
         body='Scan QRcode and get company email',
         from_email='app@mailhog.com',
         to=(f'{user_email}',),
     )
-    msg.attach_file(image_path)
+
+    with tempfile.NamedTemporaryFile(suffix='.png') as tmp:
+        img = qrcode.make(company_email)
+        img.save(tmp.name)
+        tmp.seek(0)
+        msg.attach("qrcode.png", tmp.read(), "image/png")
+
     msg.send()
