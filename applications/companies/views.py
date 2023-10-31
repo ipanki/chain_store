@@ -14,7 +14,8 @@ from applications.companies.serializers import (CreateCompanyProductSerializer,
                                                 CreateCompanySerializer,
                                                 CreateEmployeeSerializer,
                                                 GetCompanyProductSerializer,
-                                                GetCompanySerializer)
+                                                GetCompanySerializer,
+                                                GetEmployeeSerializer)
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -70,20 +71,27 @@ class CompanyProductViewSet(viewsets.ModelViewSet):
             Q(company__owner=self.request.user) & Q(company__id=self.kwargs['company_id']))
         return queryset
 
+    def preform_create(self, serializer):
+        company = self.request.user.companies.filter(
+            pk=self.kwargs['company_id']).first()
+        serializer.save(company=company)
+
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
-    serializer_class = CreateEmployeeSerializer
+    serializer_class = GetEmployeeSerializer
 
     def get_queryset(self):
         queryset = Employee.objects.filter(
             Q(company__owner=self.request.user) & Q(company__id=self.kwargs['company_id']))
         return queryset
 
-    def create(self, request, *args, **kwargs):
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CreateEmployeeSerializer
+        return super().get_serializer_class()
+
+    def preform_create(self, serializer):
         company = self.request.user.companies.filter(
-            pk=request.data['company']).first()
-        if company:
-            return super().create(request, *args, **kwargs)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data="You can only add employees to your own companies")
+            pk=self.kwargs['company_id']).first()
+        serializer.save(company=company)

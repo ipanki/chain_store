@@ -35,7 +35,7 @@ class Employee(AbstractInstance):
     last_name = models.CharField(max_length=25)
     email = models.EmailField(max_length=254, unique=True)
     company = models.ForeignKey(
-        'companies.Company', on_delete=models.CASCADE, related_name="employees")
+        'companies.Company', on_delete=models.CASCADE, related_name="employees", null=True)
 
     class Meta:
         unique_together = ('email', 'company',)

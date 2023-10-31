@@ -13,10 +13,8 @@ def increase_debt():
 
 
 def reduce_debt():
-    companies = Company.objects.all()
+    companies = Company.objects.exclude(category="factory")
     for company in companies:
-        if company.category == 'factory':
-            continue
         part_debt = random.randint(100, 10000)
         if company.debt >= part_debt:
             company.debt -= part_debt

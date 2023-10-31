@@ -34,7 +34,7 @@ class CreateCompanyProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompanyProduct
-        fields = ('count', 'product', 'company')
+        fields = ('count', 'product')
 
 
 class GetCompanyProductSerializer(serializers.ModelSerializer):
@@ -42,11 +42,17 @@ class GetCompanyProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompanyProduct
-        fields = ('count', 'product')
+        fields = ('id', 'count', 'product')
 
 
 class CreateEmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ('first_name', 'last_name', 'email', 'company')
+        fields = ('first_name', 'last_name', 'email')
+
+
+class GetEmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ('id', 'first_name', 'last_name', 'email', 'company')
