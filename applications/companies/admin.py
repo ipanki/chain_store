@@ -11,7 +11,8 @@ from applications.companies.tasks import async_cancel_debt
 @admin.action(description="Cancel debt")
 def cancel_debt(modeladmin, request, queryset):
     if len(queryset) > 20:
-        async_cancel_debt.delay(queryset)
+        companies_id = queryset.values_list("pk", flat=True)
+        async_cancel_debt.delay(list(companies_id))
     else:
         queryset.update(debt=0)
 

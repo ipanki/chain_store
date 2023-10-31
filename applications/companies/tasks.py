@@ -1,12 +1,13 @@
 from django.core.mail import EmailMultiAlternatives
 
+from applications.companies.models import Company
 from applications.companies.services import increase_debt, reduce_debt
 from chain_store.celery import app
 
 
 @app.task
-def async_cancel_debt(queryset):
-    queryset.update(debt=0)
+def async_cancel_debt(companies_id):
+    Company.objects.filter(pk__in=companies_id).update(debt=0)
 
 
 @app.task
