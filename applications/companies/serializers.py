@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from applications.companies.models import (Address, Company, CompanyProduct,
                                            Employee)
+from applications.products.serializers import ProductSerializer
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -34,6 +35,14 @@ class CreateCompanyProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyProduct
         fields = ('count', 'product', 'company')
+
+
+class GetCompanyProductSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+
+    class Meta:
+        model = CompanyProduct
+        fields = ('count', 'product')
 
 
 class CreateEmployeeSerializer(serializers.ModelSerializer):

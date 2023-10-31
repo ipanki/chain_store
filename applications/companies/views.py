@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
@@ -13,6 +13,7 @@ from applications.companies.permissions import (CompanyPermission,
 from applications.companies.serializers import (CreateCompanyProductSerializer,
                                                 CreateCompanySerializer,
                                                 CreateEmployeeSerializer,
+                                                GetCompanyProductSerializer,
                                                 GetCompanySerializer)
 
 
@@ -59,9 +60,14 @@ class CompanyProductViewSet(viewsets.ModelViewSet):
     permission_classes = (CompanyProductPermission,)
     serializer_class = CreateCompanyProductSerializer
 
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return GetCompanyProductSerializer
+        return super().get_serializer_class()
+
     def get_queryset(self):
         queryset = CompanyProduct.objects.filter(
-            company__owner=self.request.user)
+            Q(company__owner=self.request.user) & Q(company__id=self.kwargs['company_id']))
         return queryset
 
 
@@ -70,7 +76,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     serializer_class = CreateEmployeeSerializer
 
     def get_queryset(self):
-        queryset = Employee.objects.filter(company__owner=self.request.user)
+        queryset = Employee.objects.filter(
+            Q(company__owner=self.request.user) & Q(company__id=self.kwargs['company_id']))
         return queryset
 
     def create(self, request, *args, **kwargs):
