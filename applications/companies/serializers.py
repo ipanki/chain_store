@@ -13,15 +13,14 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = ('country', 'city', 'street', 'house')
 
 
-class CreateCompanySerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
-    address = AddressSerializer()
+class CreateCompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
         fields = ('category', 'name', 'email', 'address', 'supplier')
 
 
-class GetCompanySerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
+class GetCompanySerializer(serializers.ModelSerializer):
     address = AddressSerializer()
 
     class Meta:
@@ -30,7 +29,7 @@ class GetCompanySerializer(WritableNestedModelSerializer, serializers.ModelSeria
                   'address', 'supplier', 'debt')
 
 
-class CreateCompanyProductSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
+class CreateCompanyProductSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
 
     class Meta:
@@ -38,7 +37,7 @@ class CreateCompanyProductSerializer(WritableNestedModelSerializer, serializers.
         fields = ('count', 'product', 'company')
 
 
-class CreateEmployeeSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
+class CreateEmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
